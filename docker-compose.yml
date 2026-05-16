@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  emqx:
+    image: emqx/emqx:5.8.0
+    container_name: emqx_broker
+    environment:
+      - EMQX_ALLOW_ANONYMOUS=true # Дозволяємо підключення без пароля для розробки
+    ports:
+      - "1883:1883"     # MQTT over TCP (для Postman / бекенд сервісів)
+      - "8083:8083"     # MQTT over WebSockets (для браузерних клієнтів HTML/JS)
+      - "18083:18083"   # EMQX Dashboard (Панель керування: http://localhost:18083, admin/public)
+    volumes:
+      - ./emqx.conf:/opt/emqx/etc/emqx.conf
+    restart: unless-stopped

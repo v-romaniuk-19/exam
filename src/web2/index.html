@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Client 2</title>
+    <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #fff0f5; }
+        #messages { border: 1px solid #ccc; height: 200px; overflow-y: scroll; padding: 10px; background: #fff; margin-bottom: 10px; }
+        .msg { margin: 5px 0; }
+        .self { color: red; }
+        .other { color: green; }
+    </style>
+</head>
+<body>
+<h2>Веб-Сервіс 2 (Клієнт B)</h2>
+<div id="messages"></div>
+<input type="text" id="msgInput" placeholder="Введіть повідомлення...">
+<button onclick="sendMessage()">Відправити</button>
+
+<script>
+    const clientId = 'web_client_2_' + Math.random().toString(16).substr(2, 8);
+    const host = 'ws://localhost:8083/mqtt';
+    const topic = 'exam/messages';
+
+    const client = mqtt.connect(host, { clientId: clientId });
+
+    client.on('connect', () => {
+        console.log('Підключено до EMQX (Web 2)');
+        client.subscribe(topic, (err) => {
+            if (!err) appendMessage('Система', 'Успішно підключено до топіку: ' + topic);
+        });
+    });
+
+    client.on('message', (t, message) => {
+        const data = JSON.parse(message.toString());
+        const type = data.sender === 'Web 2' ? 'self' : 'other';
+        appendMessage(data.sender, data.text, type);
+    });
+
+    function sendMessage() {
+        const input = document.getElementById('msgInput');
+        if (input.value.trim() === '') return;
+
+        const payload = JSON.stringify({ sender: 'Web 2', text: input.value });
+        client.publish(topic, payload);
+        input.value = '';
+    }
+
+    function appendMessage(sender, text, type = 'other') {
+        const div = document.getElementById('messages');
+        div.innerHTML += `<div class="msg ${type}"><b>${sender}:</b> ${text}</div>`;
+        div.scrollTop = div.scrollHeight;
+    }
+</script>
+</body>
+</html>

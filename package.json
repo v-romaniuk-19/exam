@@ -1,0 +1,11 @@
+{
+  "name": "mqtt-event-driven-exam",
+  "version": "1.0.0",
+  "description": "Event-Driven architecture using EMQX",
+  "scripts": {
+    "start": "http-server src -c-1 -p 8080"
+  },
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}
